@@ -1,0 +1,117 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="EMR.BranchOffice.Discovery.Discovery.BranchOffice" Enabled="true" Target="Windows!Microsoft.Windows.Computer">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="EMR.BranchOffice.Discovery.Class.BranchOffice" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedPowerShell.DiscoveryProvider">
+          <IntervalSeconds>3600</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>DiscoverBranchOfficeServer.ps1</ScriptName>
+          <ScriptBody>
+            <![CDATA[
+            param($sourceId,$managedEntityId,$computerName,$debug)
+            #Constants used for event logging
+            $SCRIPT_NAME                                = 'DiscoverBranchOfficeServer.ps1'
+            $EVENT_LEVEL_ERROR                          = 1
+            $EVENT_LEVEL_WARNING                        = 2
+            $EVENT_LEVEL_INFO                           = 4
+            $SCRIPT_STARTED                             = 811
+            $CLASS_CREATED                              = 812
+            $SCRIPT_ENDED                               = 815
+            $debug                                      = $true
+            #==================================================================================
+            # Sub:                   LogDebugEvent
+            # Purpose:          Logs an informational event to the Operations Manager event log
+            #                                             only if Debug argument is true
+            #==================================================================================
+            function Log-DebugEvent
+            {
+            param($eventNo,$message)
+
+            $message = "`n" + $message
+            if ($debug = $true)
+            {
+            $api.LogScriptEvent($SCRIPT_NAME,$eventNo,$EVENT_LEVEL_INFO,$message)
+            }
+            }
+
+            $BranchCode=$Matches["BranchCode"]
+            $CityCode=$Matches["CityCode"]
+            $SubeKodu=$Matches["BranchServerType"]
+
+            $api = New-Object -comObject 'MOM.ScriptAPI'
+            #Log a message that script is starting only if Debug argument is True
+            $message =        'Script started' + "`n" + `
+            'Source ID: ' + $sourceId + "`n" + `
+            'Managed Entity ID: ' + $managedEntityId + "`n" + `
+            'Computer Name: ' + $computerName
+            Log-DebugEvent -eventNo $SCRIPT_STARTED -message $message
+
+            $Servername = $env:computername
+            $result =$Servername -match "(?&lt;Prefix&gt;SB)(?&lt;CityCode&gt;\d{2})(?&lt;BranchCode&gt;\d{4})(?&lt;BranchServerType&gt;D1|Y1|O1|O2)"
+
+            #$Matches
+            #$Matches["SubeKodu"]
+
+            $message =        'Regex Result' + "`n" + `
+            'Result:' + $Matches + "`n" + `
+            'SubeKodu: ' + $Matches["BranchCode"]
+
+            Log-DebugEvent -eventNo $CLASS_CREATED -message $message
+
+
+
+
+            if ($result) {
+            $discoveryData = $api.CreateDiscoveryData(0, $sourceId, $managedEntityId)
+            #Create a Central Queue class instance for each subfolder.
+            $instance = $discoveryData.CreateClassInstance("$MPElement[Name='EMR.BranchOffice.Discovery.Class.BranchOffice']$")
+
+            #Since the CentralQueue class is hosted, we need to provide it's key property and the key properties of any parents.
+            #The key property of CentralQueue is StoreCode.
+            #The hosting class for CentralQueue is CentralServer which has no key property.
+            #The hosting class for CentralServer is Windows Computer which has a key property of PrincipalName.
+            $instance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", $computerName)
+            $instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $Servername)
+            $instance.AddProperty("$MPElement[Name='EMR.BranchOffice.Discovery.Class.BranchOffice']/BranchCode$", $Matches["BranchCode"])
+            $instance.AddProperty("$MPElement[Name='EMR.BranchOffice.Discovery.Class.BranchOffice']/CityCode$", $Matches["CityCode"])
+            $instance.AddProperty("$MPElement[Name='EMR.BranchOffice.Discovery.Class.BranchOffice']/BranchServerType$", $Matches["BranchServerType"])
+            $discoveryData.AddInstance($instance)
+            $discoveryData
+            }
+            Log-DebugEvent -eventNo $SCRIPT_ENDED -message 'Script ended.'
+            ]]>
+          </ScriptBody>
+          <Parameters>
+            <Parameter>
+              <Name>sourceID</Name>
+              <Value>$MPElement$</Value>
+            </Parameter>
+            <Parameter>
+              <Name>managedEntityID</Name>
+              <Value>$Target/Id$</Value>
+            </Parameter>
+            <Parameter>
+              <Name>computerName</Name>
+              <Value>$Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Value>
+            </Parameter>
+          </Parameters>
+          <TimeoutSeconds>30</TimeoutSeconds>
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU">
+      <DisplayStrings>
+        <DisplayString ElementID="EMR.BranchOffice.Discovery.Discovery.BranchOffice">
+          <Name>BranchOffice Discovery</Name>
+          <Description>BranchOffice Discovery</Description>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>
