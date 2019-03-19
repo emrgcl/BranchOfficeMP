@@ -15,6 +15,7 @@
 
           <Property ID="BranchCode" Type="int" Key="false" />
           <Property ID="CityCode" Type="int" Key="false"  />
+          <Property ID="BranchServerType" Type="int" Key="false"  />
         </ClassType>
 
       </ClassTypes>
@@ -27,10 +28,21 @@
         <!-- This is the string users of the Operations Console and Web Console will see. 
              Descriptions are also helpful when the user is doing a search in the Console. -->
         <DisplayString ElementID="EMR.BranchOffice.Discovery.Class.BranchOffice">
-          <Name>BranchOffice Class</Name>
+          <Name>Branch Office</Name>
           <Description>BranchOffice Class</Description>
         </DisplayString>
-
+        <DisplayString ElementID="EMR.BranchOffice.Discovery.Class.BranchOffice" SubElementID="BranchCode">
+          <Name>BranchCode</Name>
+          <Description>BranchCode Prpoerty</Description>
+        </DisplayString>
+        <DisplayString ElementID="EMR.BranchOffice.Discovery.Class.BranchOffice" SubElementID="CityCode">
+          <Name>CityCode</Name>
+          <Description>CityCode Property</Description>
+        </DisplayString>
+        <DisplayString ElementID="EMR.BranchOffice.Discovery.Class.BranchOffice" SubElementID="BranchServerType">
+          <Name>BranchServerType</Name>
+          <Description>BranchServerType Property</Description>
+        </DisplayString>
         <!-- Uncomment the below section if you need to add a user friendly string for each property. -->
         <!--
         <DisplayString ElementID="EMR.BranchOffice.Discovery.BranchOffice" SubElementID="Property1">

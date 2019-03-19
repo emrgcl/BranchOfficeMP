@@ -1,4 +1,38 @@
-﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ManagementPack SchemaVersion="2.0" ContentReadable="true" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Manifest>
+    <Identity>
+      <ID>EMR.BranchOffice.Discovery</ID>
+      <Version>1.0.0.2</Version>
+    </Identity>
+    <Name>Branch Office Discovery</Name>
+    <References>
+      <Reference Alias="Windows">
+        <ID>Microsoft.Windows.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="System">
+        <ID>System.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+    </References>
+  </Manifest>
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="EMR.BranchOffice.Discovery.Class.BranchOffice" Base="Windows!Microsoft.Windows.ComputerRole" Accessibility="Public" Abstract="false" Hosted="true" Singleton="false">
+          <!-- Inside this section, you can add and remove properties as needed.
+               More information can be found in the Management Pack Development Kit: 
+               http://msdn.microsoft.com/en-us/library/ee533714.aspx -->
+          <Property ID="BranchCode" Type="int" Key="false" />
+          <Property ID="CityCode" Type="int" Key="false" />
+          <Property ID="BranchServerType" Type="int" Key="false" />
+        </ClassType>
+      </ClassTypes>
+    </EntityTypes>
+  </TypeDefinitions>
   <Monitoring>
     <Discoveries>
       <Discovery ID="EMR.BranchOffice.Discovery.Discovery.BranchOffice" Enabled="true" Target="Windows!Microsoft.Windows.Computer">
@@ -11,7 +45,7 @@
           <SyncTime />
           <ScriptName>DiscoverBranchOfficeServer.ps1</ScriptName>
           <ScriptBody>
-            <![CDATA[
+            
 param($sourceId,$managedEntityId,$computerName,$debug)
             #Constants used for event logging
             $SCRIPT_NAME                                = 'DiscoverBranchOfficeServer.ps1'
@@ -51,7 +85,7 @@ param($sourceId,$managedEntityId,$computerName,$debug)
             Log-DebugEvent -eventNo $SCRIPT_STARTED -message $message
 
             $Servername = $env:computername
-            $result =$Servername -match "(?<Prefix>SI)(?<CityCode>\d{3})(?<BranchCode>\d{3})(?<Net>NET)(?<BranchServerType>01|02)"
+            $result =$Servername -match "(?&lt;Prefix&gt;SI)(?&lt;CityCode&gt;\d{3})(?&lt;BranchCode&gt;\d{3})(?&lt;Net&gt;NET)(?&lt;BranchServerType&gt;01|02)"
 
             #$Matches
             #$Matches["SubeKodu"]
@@ -83,7 +117,7 @@ param($sourceId,$managedEntityId,$computerName,$debug)
             $discoveryData
             }
             Log-DebugEvent -eventNo $SCRIPT_ENDED -message 'Script ended.'
-            ]]>
+            
           </ScriptBody>
           <Parameters>
             <Parameter>
@@ -105,14 +139,34 @@ param($sourceId,$managedEntityId,$computerName,$debug)
     </Discoveries>
   </Monitoring>
   <LanguagePacks>
-    <LanguagePack ID="ENU">
+    <LanguagePack ID="ENU" IsDefault="true">
       <DisplayStrings>
+        <DisplayString ElementID="EMR.BranchOffice.Discovery.Class.BranchOffice">
+          <Name>Branch Office</Name>
+          <Description>BranchOffice Class</Description>
+        </DisplayString>
+        <DisplayString ElementID="EMR.BranchOffice.Discovery.Class.BranchOffice" SubElementID="BranchCode">
+          <Name>BranchCode</Name>
+          <Description>BranchCode Prpoerty</Description>
+        </DisplayString>
+        <DisplayString ElementID="EMR.BranchOffice.Discovery.Class.BranchOffice" SubElementID="CityCode">
+          <Name>CityCode</Name>
+          <Description>CityCode Property</Description>
+        </DisplayString>
+        <DisplayString ElementID="EMR.BranchOffice.Discovery.Class.BranchOffice" SubElementID="BranchServerType">
+          <Name>BranchServerType</Name>
+          <Description>BranchServerType Property</Description>
+        </DisplayString>
         <DisplayString ElementID="EMR.BranchOffice.Discovery.Discovery.BranchOffice">
           <Name>BranchOffice Discovery</Name>
           <Description>BranchOffice Discovery</Description>
         </DisplayString>
-      
+        <DisplayString ElementID="EMR.BranchOffice.Discovery">
+          <Name>Branch Office Discovery</Name>
+          <Description>Branch Office Discovery</Description>
+        </DisplayString>
       </DisplayStrings>
+      <KnowledgeArticles></KnowledgeArticles>
     </LanguagePack>
   </LanguagePacks>
-</ManagementPackFragment>
+</ManagementPack>
